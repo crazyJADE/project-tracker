@@ -161,8 +161,8 @@ document.getElementById('today').textContent=todayStr;
    1) 在 Supabase 项目里拿到 Project URL / anon public key
    2) 填进下面两个常量，然后部署到 GitHub Pages 即可多人共用同一份数据
 */
-const SUPABASE_URL = 'https://crazyjade.github.io/project-tracker/'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlcG5rcnhnYXdhcGRkdm1hZW1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2OTEyODUsImV4cCI6MjA5NTI2NzI4NX0.8qrNCMypugtPEObIkWMF1m9Zd9DSaZmykhe5oNAaE1Q'
+const SUPABASE_URL = '';      // 例如：https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = ''; // 例如：eyJhbGciOiJIUzI1NiIsInR5cCI6...
 const WORKSPACE_ID = 'default'; // 同一团队共用的“空间”ID；也可以换成你们团队名
 const SUPA = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -286,10 +286,11 @@ function sameJson(a,b){
 async function refreshAuth(){
   const btn=document.getElementById('authBtn');
   if(!SUPA){
-    sessionUser=null;canEdit=false;
-    if(btn){btn.textContent='登录';btn.disabled=true;btn.title='未配置 Supabase，当前仅本机模式';}
+    // 未配置 Supabase：仍允许按“本机 localStorage”使用（与原版一致），只是没有多人共享/登录
+    sessionUser=null;canEdit=true;
+    if(btn){btn.textContent='登录';btn.disabled=true;btn.title='未配置 Supabase：当前仅本机模式（多人共享/登录不可用）';}
     setSyncMode('本机（仅当前浏览器）');
-    document.getElementById('addBtn').disabled=true;
+    document.getElementById('addBtn').disabled=false;
     return;
   }
 
@@ -299,9 +300,11 @@ async function refreshAuth(){
   // 是否为“可编辑成员”：依赖 allowed_editors 表（RLS 只允许本人查询本人那一行）
   canEdit = false;
   if(sessionUser?.email){
+    // 用大小写不敏感匹配，避免邮箱大小写/空格导致判定失败
+    const emailNorm = (sessionUser.email || '').trim().toLowerCase();
     const { data: editorRow } = await SUPA.from('allowed_editors')
       .select('email')
-      .eq('email', sessionUser.email)
+      .ilike('email', emailNorm)
       .maybeSingle();
     canEdit = !!editorRow;
   }
