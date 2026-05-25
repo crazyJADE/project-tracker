@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多项目开发节点跟踪器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Noto+Sans+SC:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F2E9;--card:#FFFDF8;--ink:#1E1B16;--muted:#6F6A5E;--line:#E2DBCB;
+    --teal:#0F5257;--teal-soft:#0f525714;--delay:#B23A2E;--delay-soft:#b23a2e16;
+    --ahead:#2E6B3F;--ahead-soft:#2e6b3f16;--amber:#B5731B;--amber-soft:#b5731b18;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:radial-gradient(circle at 12% 0%,#fffdf8 0%,transparent 45%),
+    radial-gradient(circle at 95% 6%,#0f52570d 0%,transparent 40%),var(--paper);
+    color:var(--ink);font-family:"Noto Sans SC",sans-serif;line-height:1.55;padding:26px 20px 70px;min-height:100vh;}
+  .wrap{max-width:1040px;margin:0 auto;}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+  h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(26px,4.5vw,42px);letter-spacing:-.01em;line-height:1.05;margin-bottom:6px;}
+  .lead{font-size:13.5px;color:var(--muted);margin-bottom:18px;}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .save{font-family:"Space Mono",monospace;font-size:12px;}
+  .save .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;background:var(--ahead-soft);color:var(--ahead);transition:.2s;}
+  .save .pill.busy{background:var(--amber-soft);color:var(--amber);}
+  .save .pill .sd{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .btn{font-family:"Noto Sans SC";font-size:13px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;cursor:pointer;color:var(--ink);transition:.15s;font-weight:500;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn.primary{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .btn.primary:hover{background:#0c4348;color:#fff;}
+
+  .section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:22px;box-shadow:0 1px 2px #1e1b1608;}
+  .section h2{font-family:"Fraunces",serif;font-weight:600;font-size:20px;margin-bottom:3px;}
+  .section .sub{font-size:12.5px;color:var(--muted);margin-bottom:20px;}
+
+  .chart{display:flex;align-items:flex-end;gap:18px;min-height:200px;overflow-x:auto;padding-bottom:4px;}
+  .cbar-col{flex:0 0 auto;min-width:84px;display:flex;flex-direction:column;align-items:center;}
+  .cbar-val{font-family:"Space Mono",monospace;font-weight:700;font-size:15px;margin-bottom:6px;}
+  .cbar-wrap{height:150px;display:flex;align-items:flex-end;width:46px;}
+  .cbar{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .5s ease;}
+  .cbar-name{margin-top:10px;font-size:13px;font-weight:500;text-align:center;max-width:96px;line-height:1.3;}
+  .cbar-bn{margin-top:3px;font-size:11px;color:var(--muted);text-align:center;}
+  .axis{border-top:1px solid var(--line);margin-top:0;}
+  .empty{color:var(--muted);font-size:13.5px;padding:18px 0;text-align:center;}
+
+  .pcard{border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;background:#fffdf8;}
+  .phead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+  .pname{font-family:"Noto Sans SC";font-weight:700;font-size:17px;border:none;background:transparent;color:var(--ink);min-width:160px;flex:1;border-bottom:1.5px solid transparent;padding:2px;}
+  .pname:focus{outline:none;border-bottom-color:var(--teal);}
+  .pname:hover{border-bottom-color:var(--line);}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .seg button{border:none;background:#fff;padding:5px 11px;cursor:pointer;font-family:"Noto Sans SC";font-size:12.5px;color:var(--muted);}
+  .seg button.on{background:var(--teal);color:#fff;}
+  .pmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);}
+  .pmeta input[type=date]{font-family:"Space Mono",monospace;font-size:12px;border:1px solid var(--line);border-radius:7px;padding:4px 7px;background:#fff;color:var(--ink);}
+  .pmeta input[type=date]:focus{outline:none;border-color:var(--teal);}
+  .del{border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;padding:4px;border-radius:6px;}
+  .del:hover{background:var(--delay-soft);color:var(--delay);}
+
+  .summary{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 4px;font-size:13px;}
+  .summary .s{display:flex;align-items:baseline;gap:6px;}
+  .summary .s b{font-family:"Space Mono",monospace;font-size:17px;}
+  .s.warn b{color:var(--delay);}
+
+  .noterow{display:flex;align-items:center;gap:10px;margin:12px 0 2px;background:#0f52570a;border:1px solid var(--line);border-radius:10px;padding:9px 13px;}
+  .notelabel{font-size:12.5px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+  .noterow{align-items:flex-start;}
+  .noteinput{flex:1;min-height:44px;max-height:160px;resize:vertical;
+    font-family:"Noto Sans SC";font-size:13px;line-height:1.45;
+    border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+    padding:7px 9px;}
+  .noteinput:focus{outline:none;border-color:var(--teal);}
+  .noteinput::placeholder{color:#b7b09c;}
+
+  .tlwrap{overflow-x:auto;padding:8px 0 4px;}
+  .timeline{display:flex;align-items:flex-start;min-width:640px;margin-top:8px;}
+  .node{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;position:relative;}
+  .dot{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--line);background:#fff;z-index:2;transition:.2s;}
+  .dot.done{background:var(--teal);border-color:var(--teal);}
+  .dot.late{background:var(--delay);border-color:var(--delay);}
+  .dot.over{background:#fff;border-color:var(--amber);}
+  .conn{position:absolute;top:8px;left:50%;width:100%;height:3px;background:var(--line);z-index:1;}
+  .conn.done{background:var(--teal);}
+  .conn.late{background:var(--delay);}
+  .nlabel{margin-top:9px;font-size:11.5px;text-align:center;line-height:1.25;color:var(--ink);}
+  .ndelay{font-family:"Space Mono",monospace;font-size:11px;margin-top:2px;font-weight:700;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  .detail{margin-top:14px;border-top:1px dashed var(--line);padding-top:6px;}
+  .drow-head,.drow{display:grid;grid-template-columns:1.3fr 1fr 1fr .7fr;gap:10px;align-items:center;padding:8px 4px;font-size:13px;}
+  .drow-head{font-size:11.5px;color:var(--muted);border-bottom:1px solid var(--line);}
+  .drow{border-bottom:1px solid #00000008;}
+  .drow .std{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);}
+  .drow input[type=date]{font-family:"Space Mono",monospace;font-size:12px;border:1px solid var(--line);border-radius:7px;padding:4px 7px;background:#fff;color:var(--ink);width:100%;}
+  .drow input[type=date]:focus{outline:none;border-color:var(--teal);}
+  .drow .dd{font-family:"Space Mono",monospace;font-weight:700;font-size:13px;}
+  .link{background:none;border:none;color:var(--teal);cursor:pointer;font-size:12.5px;font-family:"Noto Sans SC";padding:8px 2px 0;text-decoration:underline;}
+
+  .cfg{margin-top:6px;}
+  .cfg summary{cursor:pointer;font-size:13px;color:var(--teal);font-weight:500;}
+  .cfgtable{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  .cfg-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:0;align-items:center;border-bottom:1px solid var(--line);}
+  .cfg-row:last-child{border-bottom:none;}
+  .cfg-row>div{padding:8px 12px;font-size:13px;}
+  .cfg-row.head{background:#0f52570a;font-size:11.5px;color:var(--muted);}
+  .cfg-row input{width:64px;font-family:"Space Mono",monospace;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;text-align:center;}
+  .cfg-row input:focus{outline:none;border-color:var(--teal);}
+  .cfg-note{font-size:11.5px;color:var(--amber);margin-top:8px;}
+
+  footer{margin-top:24px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7;}
+  @media(max-width:640px){.section{padding:18px 14px;}.summary{gap:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Multi-Project · Milestone Tracker</div>
+  <h1>多项目开发节点跟踪器</h1>
+  <p class="lead">每个项目从「预立项启动」算起，按一次性／二次性的标准工作日自动推算各节点的标准完成日；填入实际完成日即可看到延期、卡点与备注。</p>
+
+  <div class="toolbar">
+    <button class="btn primary" id="addBtn">+ 新建项目</button>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn" id="authBtn" title="登录后可编辑">登录</button>
+      <div class="save"><span class="pill" id="savePill"><span class="sd"></span><span id="saveTxt">就绪</span></span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>项目延期对比</h2>
+    <div class="sub">横轴 = 各项目 · 纵轴 = 累计延期天数（柱高），柱下标注目前节点</div>
+    <div id="chart" class="chart"></div>
+    <div class="axis"></div>
+  </div>
+
+  <div id="projects"></div>
+
+  <div class="section cfg">
+    <details>
+      <summary>⚙️ 标准工时设置（按产品类型，单位：工作日）</summary>
+      <div id="cfgTable"></div>
+      <div class="cfg-note">注：标准日期按"跳过周末"的工作日推算，未含法定节假日；如需精确可在此调整或手动改实际日期。</div>
+    </details>
+  </div>
+
+  <footer>数据：<span id="syncMode">本机</span> · 基准日：<span id="today"></span></footer>
+</div>
+
+<!-- Supabase JS SDK（用于云端数据 + 登录 + 实时同步） -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const KEY='tracker_multi_v1';
+const todayStr=new Date().toISOString().slice(0,10);
+document.getElementById('today').textContent=todayStr;
+
+/* ---------- Supabase 配置（需要你填写） ----------
+   1) 在 Supabase 项目里拿到 Project URL / anon public key
+   2) 填进下面两个常量，然后部署到 GitHub Pages 即可多人共用同一份数据
+*/
+const SUPABASE_URL = '';      // 例如：https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = ''; // 例如：eyJhbGciOiJIUzI1NiIsInR5cCI6...
+const WORKSPACE_ID = 'default'; // 同一团队共用的“空间”ID；也可以换成你们团队名
+const SUPA = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+let sessionUser = null;
+let canEdit = false;            // 只有“成员”才可编辑；其他人只读
+let rtChannel = null;           // Realtime 订阅
+let lastLocalPushAt = 0;        // 用于忽略自己刚推送引发的回声更新
+
+const STAGES=[
+  {key:'kickoff', label:'预立项启动'},
+  {key:'stack',   label:'堆叠设计'},
+  {key:'id',      label:'ID设计'},
+  {key:'review',  label:'ID评审'},
+  {key:'optimize',label:'ID优化'},
+  {key:'final',   label:'ID定稿'},
+  {key:'sample',  label:'手板阶段'},
+  {key:'launch',  label:'项目立项'},
+];
+const DEFAULT_DUR={
+  stack:{a:3,b:5}, id:{a:15,b:21}, review:{a:1,b:1},
+  optimize:{a:7,b:10}, final:{a:1,b:1}, sample:{a:17,b:21}, launch:{a:0,b:0}
+};
+
+let state={config:{dur:JSON.parse(JSON.stringify(DEFAULT_DUR))}, projects:[]};
+let expanded=new Set();
+let pendingTimer=null;
+
+function uid(){return 'p'+Math.random().toString(36).slice(2,8);}
+function dayDiff(a,b){if(!a||!b)return null;return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function escHtml(s){return (s??'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function addWorkingDays(dateStr,days){
+  let d=new Date(dateStr+'T00:00:00'),added=0;
+  while(added<days){d.setDate(d.getDate()+1);const w=d.getDay();if(w!==0&&w!==6)added++;}
+  return d.toISOString().slice(0,10);
+}
+function durOf(key,type){if(key==='kickoff')return 0;const c=state.config.dur[key];return c?(type==='b'?c.b:c.a):0;}
+function cumWD(idx,type){let s=0;for(let i=1;i<=idx;i++)s+=durOf(STAGES[i].key,type);return s;}
+function stdDate(p,idx){if(!p.start)return null;if(idx===0)return p.start;return addWorkingDays(p.start,cumWD(idx,p.type));}
+function actOf(p,idx){return idx===0?(p.start||''):((p.actuals&&p.actuals[STAGES[idx].key])||'');}
+
+function metrics(p){
+  let cum=0,bnLabel='—',maxInc=0,done=0,lastDone=-1,running=0;
+  STAGES.forEach((st,i)=>{
+    const act=actOf(p,i), std=stdDate(p,i);
+    if(act){done++;lastDone=i;}
+    if(act&&std){const dl=dayDiff(std,act);const inc=dl-running;
+      if(inc>maxInc){maxInc=inc;bnLabel=st.label;}running=dl;cum=dl;}
+  });
+  return {cum,bnLabel,done,total:STAGES.length,lastDone};
+}
+function currentStageLabel(p){
+  if(!p.start) return '未开始';
+  for(let i=1;i<STAGES.length;i++){
+    const act=actOf(p,i);
+    if(!act) return STAGES[i].label;
+  }
+  return '已完成';
+}
+
+/* ---------- 本地存储（localStorage） ---------- */
+function setSaving(){const p=document.getElementById('savePill'),t=document.getElementById('saveTxt');p.classList.add('busy');t.textContent='保存中…';}
+function setSaved(){const p=document.getElementById('savePill'),t=document.getElementById('saveTxt');p.classList.remove('busy');t.textContent='已保存 ✓';}
+function setSyncMode(text){
+  const el=document.getElementById('syncMode');
+  if(el) el.textContent=text;
+}
+function saveLocalState(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}
+  catch(e){/* 某些预览环境禁用了 localStorage，仅内存运行 */console.warn('本地存储不可用，数据仅保留在当前页面',e);}
+}
+function loadLocalState(){
+  try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s);}catch(e){}
+  return null;
+}
+async function loadRemoteState(){
+  if(!SUPA) return null;
+  const {data, error} = await SUPA.from('app_state')
+    .select('state, updated_at')
+    .eq('id', WORKSPACE_ID)
+    .maybeSingle();
+  if(error){console.warn('云端读取失败，回退到本机缓存', error); return null;}
+  return data?.state || null;
+}
+async function saveRemoteState(){
+  if(!SUPA) return;
+  const { error } = await SUPA.from('app_state').upsert(
+    { id: WORKSPACE_ID, state, updated_at: new Date().toISOString() },
+    { onConflict: 'id' }
+  );
+  if(error) throw error;
+}
+async function loadState(){
+  // 优先云端；没有云端/云端无数据时回退本机缓存
+  const remote = await loadRemoteState();
+  if(remote) return remote;
+  return loadLocalState();
+}
+async function saveState(){
+  // 仍然保留一份本机缓存（离线兜底 & 首次迁移用）
+  saveLocalState();
+  if(!SUPA){setSaved();return;}
+  if(!canEdit){setSaved();return;}
+  await saveRemoteState();
+  lastLocalPushAt = Date.now();
+  setSaved();
+}
+function scheduleSave(){
+  if(!canEdit) return;
+  clearTimeout(pendingTimer);
+  setSaving();
+  pendingTimer=setTimeout(()=>{pendingTimer=null;saveState().catch(e=>{console.warn('保存失败（已保留本机缓存）',e);setSaved();});},500);
+}
+
+function demoProject(){return {id:uid(),name:'示例项目 A',type:'a',start:'2026-01-05',note:'堆叠设计阶段供应商延迟交付样件，导致后续节点整体顺延。',actuals:{stack:'2026-01-12',id:'2026-02-03',review:'2026-02-04',optimize:'',final:'',sample:'',launch:''}};}
+
+function sameJson(a,b){
+  try{return JSON.stringify(a)===JSON.stringify(b);}catch(e){return false;}
+}
+async function refreshAuth(){
+  const btn=document.getElementById('authBtn');
+  if(!SUPA){
+    sessionUser=null;canEdit=false;
+    if(btn){btn.textContent='登录';btn.disabled=true;btn.title='未配置 Supabase，当前仅本机模式';}
+    setSyncMode('本机（仅当前浏览器）');
+    document.getElementById('addBtn').disabled=true;
+    return;
+  }
+
+  const { data: { session } } = await SUPA.auth.getSession();
+  sessionUser = session?.user || null;
+
+  // 是否为“可编辑成员”：依赖 allowed_editors 表（RLS 只允许本人查询本人那一行）
+  canEdit = false;
+  if(sessionUser?.email){
+    const { data: editorRow } = await SUPA.from('allowed_editors')
+      .select('email')
+      .eq('email', sessionUser.email)
+      .maybeSingle();
+    canEdit = !!editorRow;
+  }
+
+  if(btn){
+    btn.disabled=false;
+    btn.textContent = sessionUser ? '退出' : '登录';
+    btn.title = sessionUser
+      ? (canEdit ? `已登录：${sessionUser.email}（可编辑）` : `已登录：${sessionUser.email}（只读）`)
+      : '登录后可编辑';
+  }
+  setSyncMode(canEdit ? '云端（可编辑）' : '云端（只读）');
+  document.getElementById('addBtn').disabled = !canEdit;
+
+  // 触发一次重渲染，让输入框/按钮的 disabled 状态正确
+  render();
+}
+
+async function setupRealtime(){
+  if(!SUPA) return;
+  if(rtChannel) return;
+  rtChannel = SUPA
+    .channel('app_state_'+WORKSPACE_ID)
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'app_state', filter: `id=eq.${WORKSPACE_ID}` },
+      (payload)=>{
+        const incoming = payload?.new?.state;
+        if(!incoming) return;
+        // 忽略自己刚推送后的“回声”，以及完全相同的 state
+        if(Date.now()-lastLocalPushAt < 1200) return;
+        if(sameJson(incoming,state)) return;
+        state = incoming;
+        // 云端更新到来后，本地也缓存一份
+        saveLocalState();
+        render();
+        setSaved();
+      }
+    )
+    .subscribe();
+}
+
+async function init(){
+  // 1) 先加载数据（云端优先；无云端则本机）
+  const loaded = await loadState();
+  if(loaded&&loaded.projects){
+    state=loaded;
+    if(!state.config) state.config={dur:JSON.parse(JSON.stringify(DEFAULT_DUR))};
+  } else {
+    state={config:{dur:JSON.parse(JSON.stringify(DEFAULT_DUR))},projects:[demoProject()]};
+    saveLocalState();
+  }
+
+  // 2) 再初始化登录/权限（决定是否可编辑）
+  await refreshAuth();
+
+  // 3) 如果云端还没有数据且当前用户可编辑，则把当前 state “初始化/迁移”到云端
+  if(SUPA && canEdit){
+    const remote = await loadRemoteState();
+    if(!remote){
+      setSaving();
+      try{await saveRemoteState();lastLocalPushAt=Date.now();}catch(e){console.warn('云端初始化失败（已保留本机缓存）',e);}
+      setSaved();
+    }
+  }
+
+  // 4) 开启实时订阅（其他成员改动会自动同步到当前页面）
+  await setupRealtime();
+
+  render();
+}
+
+/* ---------- 渲染 ---------- */
+function renderChart(){
+  const el=document.getElementById('chart');
+  if(!state.projects.length){el.innerHTML='<div class="empty">还没有项目，点击「新建项目」开始。</div>';return;}
+  const data=state.projects.map(p=>({name:p.name||'未命名',cur:currentStageLabel(p),...metrics(p)}));
+  const maxCum=Math.max(10,...data.map(d=>Math.abs(d.cum)));
+  el.innerHTML=data.map(d=>{
+    const h=Math.max(4,Math.abs(d.cum)/maxCum*150);
+    const late=d.cum>0, ahead=d.cum<0;
+    const col=late?'var(--delay)':(ahead?'var(--ahead)':'var(--teal)');
+    const val=d.cum>0?('+'+d.cum):(''+d.cum);
+    const vcol=late?'var(--delay)':(ahead?'var(--ahead)':'var(--muted)');
+    return `<div class="cbar-col">
+      <div class="cbar-val" style="color:${vcol}">${d.done?val+'天':'—'}</div>
+      <div class="cbar-wrap"><div class="cbar" style="height:${h}px;background:${col}"></div></div>
+      <div class="cbar-name">${d.name}</div>
+      <div class="cbar-bn">目前节点：${d.cur}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTimeline(p){
+  const nodes=STAGES.map((st,i)=>{
+    const act=actOf(p,i), std=stdDate(p,i);
+    let cls='',dtxt='·',dcol='var(--muted)';
+    if(act&&std){const dl=dayDiff(std,act);
+      if(dl>0){cls='late';dtxt='+'+dl;dcol='var(--delay)';}
+      else if(dl<0){cls='done';dtxt=''+dl;dcol='var(--ahead)';}
+      else{cls='done';dtxt='0';dcol='var(--teal)';}
+    } else if(act){cls='done';}
+    else if(std&&dayDiff(std,todayStr)>0){cls='over';dtxt='超期';dcol='var(--amber)';}
+    return {st,cls,dtxt,dcol,done:!!act};
+  });
+  return `<div class="tlwrap"><div class="timeline">`+nodes.map((n,i)=>{
+    let conn='';
+    if(i>0){const cc=n.done?(n.cls==='late'?'late':'done'):'';conn=`<div class="conn ${cc}"></div>`;}
+    return `<div class="node">${conn}<div class="dot ${n.cls}"></div>
+      <div class="nlabel">${n.st.label}</div>
+      <div class="ndelay" style="color:${n.dcol}">${n.dtxt}</div></div>`;
+  }).join('')+`</div></div>
+  <div class="legend">
+    <span><i style="background:var(--teal)"></i>按时/提前完成</span>
+    <span><i style="background:var(--delay)"></i>延期完成</span>
+    <span><i style="background:#fff;border:2px solid var(--amber)"></i>超期未完成</span>
+    <span><i style="background:#fff;border:2px solid var(--line)"></i>未开始</span>
+  </div>`;
+}
+
+function renderDetail(p){
+  return `<div class="detail">
+    <div class="drow-head drow"><div>节点</div><div>标准完成日（自动）</div><div>实际完成日</div><div>延期</div></div>`+
+    STAGES.map((st,i)=>{
+      const std=stdDate(p,i), act=actOf(p,i);
+      let dd='—',dc='var(--muted)';
+      if(act&&std){const dl=dayDiff(std,act);if(dl>0){dd='+'+dl;dc='var(--delay)';}else if(dl<0){dd=''+dl;dc='var(--ahead)';}else{dd='0';dc='var(--teal)';}}
+      const stdTxt=i===0?(p.start||'—'):(std||'（先填起始日）');
+      const actInput=i===0
+        ? `<span class="std">＝ 起始日</span>`
+        : `<input type="date" ${canEdit?'':'disabled'} value="${act}" data-pid="${p.id}" data-stage="${st.key}">`;
+      return `<div class="drow"><div>${st.label}</div><div class="std">${stdTxt}</div><div>${actInput}</div><div class="dd" style="color:${dc}">${dd}</div></div>`;
+    }).join('')+`</div>`;
+}
+
+function renderProjects(){
+  const el=document.getElementById('projects');
+  if(!state.projects.length){el.innerHTML='';return;}
+  el.innerHTML=state.projects.map(p=>{
+    const m=metrics(p);const isOpen=expanded.has(p.id);
+    return `<div class="section pcard" data-card="${p.id}">
+      <div class="phead">
+        <input class="pname" ${canEdit?'':'disabled'} value="${(p.name||'').replace(/"/g,'&quot;')}" data-pid="${p.id}" data-f="name" placeholder="项目名称">
+        <span class="seg">
+          <button ${canEdit?'':'disabled'} data-pid="${p.id}" data-type="a" class="${p.type==='a'?'on':''}">一次性</button>
+          <button ${canEdit?'':'disabled'} data-pid="${p.id}" data-type="b" class="${p.type==='b'?'on':''}">二次性</button>
+        </span>
+        <button class="del" ${canEdit?'':'disabled'} data-del="${p.id}" title="删除项目">×</button>
+      </div>
+      <div class="pmeta">预立项启动（起始日）
+        <input type="date" ${canEdit?'':'disabled'} value="${p.start||''}" data-pid="${p.id}" data-f="start"></div>
+      <div class="summary">
+        <div class="s ${m.cum>0?'warn':''}">累计延期 <b>${m.done?(m.cum>0?'+'+m.cum:m.cum)+'天':'—'}</b></div>
+        <div class="s">卡点阶段 <b style="font-size:14px">${m.cum>0?m.bnLabel:'无'}</b></div>
+        <div class="s">进度 <b>${m.done}/${m.total}</b></div>
+      </div>
+      <div class="noterow">
+        <span class="notelabel">📝 卡点备注</span>
+        <textarea class="noteinput" ${canEdit?'':'disabled'} data-pid="${p.id}" data-f="note" placeholder="可回车换行；每一行代表一个卡点备注（例如：供应商延迟交样 / 评审意见反复修改 / 资源未到位…）">${escHtml(p.note||'')}</textarea>
+      </div>
+      ${renderTimeline(p)}
+      <button class="link" data-toggle="${p.id}">${isOpen?'收起节点明细 ▲':'展开节点明细 ▼'}</button>
+      ${isOpen?renderDetail(p):''}
+    </div>`;
+  }).join('');
+}
+
+function renderConfig(){
+  const rows=[['stack','预立项启动 → 堆叠设计'],['id','堆叠设计 → ID设计'],['review','ID设计 → ID评审'],
+    ['optimize','ID评审 → ID优化'],['final','ID优化 → ID定稿'],['sample','ID定稿 → 手板阶段'],['launch','手板阶段 → 项目立项']];
+  document.getElementById('cfgTable').innerHTML=`<div class="cfgtable">
+    <div class="cfg-row head"><div>阶段转换</div><div>一次性</div><div>二次性</div></div>`+
+    rows.map(([k,lab])=>`<div class="cfg-row"><div>${lab}</div>
+      <div><input type="number" ${canEdit?'':'disabled'} min="0" value="${state.config.dur[k].a}" data-cfg="${k}" data-t="a"></div>
+      <div><input type="number" ${canEdit?'':'disabled'} min="0" value="${state.config.dur[k].b}" data-cfg="${k}" data-t="b"></div></div>`).join('')+`</div>`;
+}
+
+function render(){renderChart();renderProjects();renderConfig();}
+
+/* ---------- 事件 ---------- */
+document.getElementById('addBtn').addEventListener('click',()=>{
+  if(!canEdit){
+    alert('当前为只读模式：请先点击右侧「登录」以获得编辑权限。');
+    return;
+  }
+  state.projects.push({id:uid(),name:'',type:'a',start:'',note:'',actuals:{}});
+  render();scheduleSave();
+  const els=document.querySelectorAll('.pname');if(els.length)els[els.length-1].focus();
+});
+
+// 文本类（项目名 / 备注）：input 实时更新，仅刷新图表避免失焦
+document.getElementById('projects').addEventListener('input',e=>{
+  if(!canEdit) return;
+  const t=e.target;const p=state.projects.find(x=>x.id===t.dataset.pid);if(!p)return;
+  if(t.dataset.f==='name'){p.name=t.value;renderChart();scheduleSave();}
+  else if(t.dataset.f==='note'){p.note=t.value;scheduleSave();}
+});
+// 日期类：change 后整张重算
+document.getElementById('projects').addEventListener('change',e=>{
+  if(!canEdit) return;
+  const t=e.target;const pid=t.dataset.pid;if(!pid)return;const p=state.projects.find(x=>x.id===pid);if(!p)return;
+  if(t.dataset.f==='start'){p.start=t.value;}
+  else if(t.dataset.stage){if(!p.actuals)p.actuals={};p.actuals[t.dataset.stage]=t.value;}
+  else return;
+  render();scheduleSave();
+});
+// 类型切换 / 删除 / 展开
+document.getElementById('projects').addEventListener('click',e=>{
+  const t=e.target;
+  if(t.dataset.toggle){
+    const id=t.dataset.toggle;expanded.has(id)?expanded.delete(id):expanded.add(id);render();return;
+  }
+  if(!canEdit) return;
+  if(t.dataset.type){const p=state.projects.find(x=>x.id===t.dataset.pid);if(p){p.type=t.dataset.type;render();scheduleSave();}}
+  else if(t.dataset.del){state.projects=state.projects.filter(x=>x.id!==t.dataset.del);expanded.delete(t.dataset.del);render();scheduleSave();}
+});
+// 工时配置
+document.getElementById('cfgTable').addEventListener('change',e=>{
+  if(!canEdit) return;
+  const t=e.target;if(!t.dataset.cfg)return;
+  const v=Math.max(0,parseInt(t.value||'0',10));state.config.dur[t.dataset.cfg][t.dataset.t]=v;render();scheduleSave();
+});
+
+// 登录 / 退出
+document.getElementById('authBtn').addEventListener('click', async ()=>{
+  if(!SUPA){
+    alert('未配置 Supabase：请先在代码里填写 SUPABASE_URL 与 SUPABASE_ANON_KEY。');
+    return;
+  }
+  if(sessionUser){
+    await SUPA.auth.signOut();
+    await refreshAuth();
+    return;
+  }
+  const email = prompt('请输入邮箱（成员账号）：');
+  if(!email) return;
+  const password = prompt('请输入密码：');
+  if(!password) return;
+  const { error } = await SUPA.auth.signInWithPassword({ email, password });
+  if(error){
+    // 给一个“可选注册”的兜底（是否允许注册由 Supabase Auth 配置决定）
+    const ok = confirm('登录失败：'+error.message+'\\n\\n是否尝试注册该账号？（注册成功后是否可编辑仍取决于 allowed_editors 白名单）');
+    if(ok){
+      const { error: e2 } = await SUPA.auth.signUp({ email, password });
+      if(e2) alert('注册失败：'+e2.message);
+      else alert('已提交注册。若项目开启了邮箱确认，请先去邮箱完成确认后再登录。');
+    }
+  }
+  await refreshAuth();
+});
+
+// 监听登录状态变化（例如多标签页退出）
+if(SUPA){
+  SUPA.auth.onAuthStateChange(()=>{refreshAuth().catch(()=>{});});
+}
+
+init();
+</script>
+</body>
+</html>
