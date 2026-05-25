@@ -161,7 +161,7 @@ document.getElementById('today').textContent=todayStr;
    1) 在 Supabase 项目里拿到 Project URL / anon public key
    2) 填进下面两个常量，然后部署到 GitHub Pages 即可多人共用同一份数据
 */
-const SUPABASE_URL = 'https://eepnkrxgawapddvmaemn.supabase.co/rest/v1/';      // 例如：https://xxxx.supabase.co
+const SUPABASE_URL = 'https://eepnkrxgawapddvmaemn.supabase.co/rest/v1/'      // 例如：https://xxxx.supabase.co
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlcG5rcnhnYXdhcGRkdm1hZW1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2OTEyODUsImV4cCI6MjA5NTI2NzI4NX0.8qrNCMypugtPEObIkWMF1m9Zd9DSaZmykhe5oNAaE1Q'; // 例如：eyJhbGciOiJIUzI1NiIsInR5cCI6...
 const WORKSPACE_ID = 'default'; // 同一团队共用的“空间”ID；也可以换成你们团队名
 const SUPA = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
