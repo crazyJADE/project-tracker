@@ -111,6 +111,101 @@
   .cfg-row input:focus{outline:none;border-color:var(--teal);}
   .cfg-note{font-size:11.5px;color:var(--amber);margin-top:8px;}
 
+  /* 节点上方说明（耗时 / 评审次数 / 优化次数） */
+  .nabove{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);
+    text-align:center;line-height:1.2;min-height:22px;
+    display:flex;align-items:flex-end;justify-content:center;margin-bottom:4px;}
+  .ncount{background:var(--teal-soft);color:var(--teal);font-weight:700;
+    padding:2px 7px;border-radius:10px;white-space:nowrap;font-size:10.5px;}
+  .nelapsed-ongoing{color:var(--amber);}
+  .nelapsed-start{color:var(--teal);font-weight:600;}
+
+  /* 节点可点击 */
+  .node{cursor:pointer;padding:2px 0;border-radius:8px;transition:background .15s;}
+  .node:hover{background:#0f52570a;}
+  .node.sel .dot{box-shadow:0 0 0 4px var(--teal-soft);transform:scale(1.05);}
+  /* 圆点和连接线的定位容器（在加了 .nabove 之后保证连接线对齐圆点中心） */
+  .dotwrap{position:relative;width:100%;height:18px;display:flex;justify-content:center;align-items:center;}
+  .dotwrap .conn{top:50%;transform:translateY(-50%);}
+
+  /* 节点备注面板（点击节点后展开） */
+  .notepanel{margin-top:14px;background:#fffdf8;border:1.5px solid var(--teal);
+    border-radius:12px;padding:14px;animation:slideIn .18s ease;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
+  .notepanel-head{display:flex;justify-content:space-between;align-items:center;
+    font-size:13px;color:var(--teal);margin-bottom:8px;font-weight:600;}
+  .notepanel-close{background:transparent;border:none;cursor:pointer;font-size:18px;
+    color:var(--muted);padding:0 4px;line-height:1;}
+  .notepanel-close:hover{color:var(--delay);}
+  .notepanel-input{width:100%;min-height:72px;font-family:"Noto Sans SC";font-size:13.5px;
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;
+    color:var(--ink);resize:vertical;line-height:1.5;}
+  .notepanel-input:focus{outline:none;border-color:var(--teal);}
+  .notepanel-input:disabled{background:#f6f2e9;color:var(--muted);}
+
+  /* 节点明细中：评审/优化次数的输入框 */
+  .countinline{display:inline-flex;align-items:center;gap:5px;margin-left:8px;
+    padding:1px 7px;background:var(--teal-soft);border-radius:8px;font-size:11.5px;color:var(--teal);}
+  .countinline input{width:42px;font-family:"Space Mono",monospace;font-size:12px;
+    border:1px solid #0f525733;border-radius:5px;padding:2px 4px;text-align:center;
+    color:var(--teal);background:#fff;}
+  .countinline input:focus{outline:none;border-color:var(--teal);}
+  .countinline input:disabled{background:#f6f2e9;color:var(--muted);}
+
+  /* 堆叠式延期柱状图 */
+  .cbar-stack{height:150px;width:46px;display:flex;flex-direction:column-reverse;
+    justify-content:flex-start;border-radius:6px 6px 0 0;overflow:hidden;background:#0000000a;}
+  .cbar-stack .seg{width:100%;}
+  .cbar-stack .seg + .seg{border-top:1px solid #fffdf8;}
+  .seg-base{width:100%;height:4px;background:var(--teal);align-self:flex-end;border-radius:6px 6px 0 0;}
+  .chart-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;font-size:11.5px;color:var(--muted);}
+  .chart-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .chart-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  /* 并行节点：虚线连接 + 并行标签 */
+  .conn.parallel{background:none;border-top:3px dashed var(--line);height:0;}
+  .conn.parallel.done{border-top-color:var(--teal);}
+  .conn.parallel.late{border-top-color:var(--delay);}
+  .ptag{display:inline-block;font-size:9px;background:#1f7a8c1a;color:#1F7A8C;
+    padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:600;vertical-align:middle;}
+
+  /* 节点明细：定义说明 + 记录子表 */
+  .dlabel{font-weight:500;}
+  .ddesc{font-size:11px;color:var(--muted);line-height:1.35;margin-top:2px;}
+  .drow.recline{padding:0 4px 10px;}
+  .recwrap{background:#0f52570a;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:2px;}
+  .rectitle{font-size:12px;color:var(--teal);font-weight:600;margin-bottom:8px;}
+  .recrow{display:grid;grid-template-columns:54px 130px 1fr 28px;gap:8px;align-items:center;margin-bottom:7px;}
+  .recidx{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);}
+  .recrow input[type=date]{font-family:"Space Mono",monospace;font-size:12px;border:1px solid var(--line);
+    border-radius:6px;padding:4px 6px;background:#fff;color:var(--ink);width:100%;}
+  .recrow input[type=text]{font-family:"Noto Sans SC";font-size:12.5px;border:1px solid var(--line);
+    border-radius:6px;padding:4px 8px;background:#fff;color:var(--ink);width:100%;}
+  .recrow input:focus{outline:none;border-color:var(--teal);}
+  .recrow input:disabled{background:#f6f2e9;color:var(--muted);}
+  .recdel{border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:15px;border-radius:5px;padding:2px;}
+  .recdel:hover{background:var(--delay-soft);color:var(--delay);}
+  .recempty{font-size:12px;color:var(--muted);padding:4px 0 8px;}
+  .recadd{margin-top:2px;background:var(--teal-soft);color:var(--teal);border:1px dashed #0f525755;
+    border-radius:8px;padding:6px 10px;cursor:pointer;font-family:"Noto Sans SC";font-size:12.5px;font-weight:500;}
+  .recadd:hover{background:#0f52571f;}
+  .recadd:disabled{opacity:.5;cursor:not-allowed;}
+  @media(max-width:640px){.recrow{grid-template-columns:46px 1fr 28px;}.recrow input[type=text]{grid-column:1/-1;}}
+
+  /* 删除确认模态框 */
+  .modal-backdrop{position:fixed;inset:0;background:#1e1b1666;display:none;
+    align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(2px);}
+  .modal-backdrop.show{display:flex;}
+  .modal{background:var(--card);border-radius:16px;padding:24px;max-width:380px;width:100%;
+    box-shadow:0 12px 40px #1e1b1633;animation:popIn .15s ease;}
+  @keyframes popIn{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;}}
+  .modal-title{font-family:"Fraunces",serif;font-weight:600;font-size:18px;margin-bottom:10px;color:var(--delay);}
+  .modal-body{font-size:14px;color:var(--ink);margin-bottom:20px;line-height:1.6;}
+  .modal-body b{color:var(--ink);font-weight:600;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .btn.modal-danger{background:var(--delay);color:#fff;border-color:var(--delay);}
+  .btn.modal-danger:hover{background:#9a3026;color:#fff;border-color:#9a3026;}
+
   footer{margin-top:24px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7;}
   @media(max-width:640px){.section{padding:18px 14px;}.summary{gap:12px;}}
 </style>
@@ -134,6 +229,7 @@
     <div class="sub">横轴 = 各项目 · 纵轴 = 累计延期天数（柱高），柱下标注目前节点</div>
     <div id="chart" class="chart"></div>
     <div class="axis"></div>
+    <div id="chartLegend" class="chart-legend"></div>
   </div>
 
   <div id="projects"></div>
@@ -147,6 +243,18 @@
   </div>
 
   <footer>数据：<span id="syncMode">本机</span> · 基准日：<span id="today"></span></footer>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal-backdrop" id="delModal">
+  <div class="modal">
+    <div class="modal-title">⚠️ 确认删除项目</div>
+    <div class="modal-body" id="delModalBody">删除后不可恢复，请确认。</div>
+    <div class="modal-actions">
+      <button class="btn" id="delModalCancel">取消</button>
+      <button class="btn modal-danger" id="delModalConfirm">确认删除</button>
+    </div>
+  </div>
 </div>
 
 <!-- Supabase JS SDK（用于云端数据 + 登录 + 实时同步） -->
@@ -174,23 +282,42 @@ let rtChannel = null;           // Realtime 订阅
 let lastLocalPushAt = 0;        // 用于忽略自己刚推送引发的回声更新
 
 const STAGES=[
-  {key:'kickoff', label:'预立项启动'},
-  {key:'stack',   label:'堆叠设计'},
-  {key:'id',      label:'ID设计'},
-  {key:'review',  label:'ID评审'},
-  {key:'optimize',label:'ID优化'},
-  {key:'final',   label:'ID定稿'},
-  {key:'sample',  label:'手板阶段'},
-  {key:'launch',  label:'项目立项'},
+  {key:'kickoff', label:'预立项启动', desc:'定义为 MRD 通过的时间（作为整个流程的起点）'},
+  {key:'stack',   label:'堆叠设计',   desc:'初步堆叠文件交付的 DDL（以工作日为计量单位）'},
+  {key:'id',      label:'ID设计',     desc:'堆叠设计完成后，结构工程师交付给 ID 设计师，开启 ID 设计'},
+  {key:'review',  label:'ID评审',     desc:'ID 设计师接到任务后完成并提交评审；完成日参考标准工时设置', records:'reviews', recordLabel:'评审'},
+  {key:'optimize',label:'ID优化',     desc:'根据评审意见进行优化；完成日参考标准工时设置', records:'optimizes', recordLabel:'优化'},
+  {key:'final',   label:'ID定稿',     desc:'定义为 ID 锁定'},
+  {key:'cmf',     label:'CMF设计',    desc:'ID 锁定后开启，与 UI 设计同步进行', parallelGroup:'design'},
+  {key:'ui',      label:'UI设计',     desc:'ID 锁定后开启，与 CMF 设计同步进行', parallelGroup:'design'},
+  {key:'sample',  label:'手板阶段',   desc:'CMF 与 UI 设计完成后进入手板阶段'},
+  {key:'launch',  label:'项目立项',   desc:''},
 ];
 const DEFAULT_DUR={
   stack:{a:3,b:5}, id:{a:15,b:21}, review:{a:1,b:1},
-  optimize:{a:7,b:10}, final:{a:1,b:1}, sample:{a:17,b:21}, launch:{a:0,b:0}
+  optimize:{a:7,b:10}, final:{a:1,b:1},
+  cmf:{a:5,b:5}, ui:{a:5,b:5},
+  sample:{a:17,b:21}, launch:{a:0,b:0}
 };
+// 前驱关系（用于推算标准日期）；'__design__' 表示 CMF/UI 两条并行线的汇合点（取较晚者）
+const PREV={
+  stack:'kickoff', id:'stack', review:'id', optimize:'review',
+  final:'optimize', cmf:'final', ui:'final',
+  sample:'__design__', launch:'sample'
+};
+// 延期对比柱状图中各阶段的固定配色与图例标签
+const PHASE_SEQ=['stack','id','review','optimize','final','design','sample','launch'];
+const PHASE_COLORS={stack:'#0F5257',id:'#2E6B3F',review:'#B5731B',optimize:'#B23A2E',
+  final:'#7A4F9E',design:'#1F7A8C',sample:'#C2603A',launch:'#4A5240'};
+const PHASE_LABELS={stack:'堆叠设计',id:'ID设计',review:'ID评审',optimize:'ID优化',
+  final:'ID定稿',design:'CMF/UI设计',sample:'手板阶段',launch:'项目立项'};
+function stageIndex(key){return STAGES.findIndex(s=>s.key===key);}
 
 let state={config:{dur:JSON.parse(JSON.stringify(DEFAULT_DUR))}, projects:[]};
 let expanded=new Set();
 let pendingTimer=null;
+let selectedNode=null;   // {pid, stageKey} 当前展开备注的节点
+let pendingDelete=null;  // 待确认删除的项目 id
 
 function uid(){return 'p'+Math.random().toString(36).slice(2,8);}
 function dayDiff(a,b){if(!a||!b)return null;return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
@@ -201,25 +328,119 @@ function addWorkingDays(dateStr,days){
   return d.toISOString().slice(0,10);
 }
 function durOf(key,type){if(key==='kickoff')return 0;const c=state.config.dur[key];return c?(type==='b'?c.b:c.a):0;}
-function cumWD(idx,type){let s=0;for(let i=1;i<=idx;i++)s+=durOf(STAGES[i].key,type);return s;}
-function stdDate(p,idx){if(!p.start)return null;if(idx===0)return p.start;return addWorkingDays(p.start,cumWD(idx,p.type));}
-function actOf(p,idx){return idx===0?(p.start||''):((p.actuals&&p.actuals[STAGES[idx].key])||'');}
+// 按 key 递归推算标准完成日，支持 CMF/UI 并行（汇合点取较晚者）
+function stdDate(p,key,memo){
+  memo=memo||{};
+  if(memo[key]!==undefined) return memo[key];
+  if(!p.start){memo[key]=null;return null;}
+  if(key==='kickoff'){memo[key]=p.start;return p.start;}
+  const prev=PREV[key];
+  let base;
+  if(prev==='__design__'){
+    const c=stdDate(p,'cmf',memo), u=stdDate(p,'ui',memo);
+    base=(!c)?u:((!u)?c:(c>u?c:u));
+  } else {
+    base=stdDate(p,prev,memo);
+  }
+  if(!base){memo[key]=null;return null;}
+  const res=addWorkingDays(base,durOf(key,p.type));
+  memo[key]=res;return res;
+}
+function actOf(p,key){return key==='kickoff'?(p.start||''):((p.actuals&&p.actuals[key])||'');}
+// CMF/UI 并行汇合点的实际完成日（取较晚者）
+function actConvergeDesign(p){
+  const c=actOf(p,'cmf'), u=actOf(p,'ui');
+  if(c&&u) return c>u?c:u;
+  return c||u||'';
+}
+
+/* 计算"此节点已经进行的时间"（自然日，与延期同单位）
+   - 起点：'起点'；已完成：'N天'；进行中：'已N天' */
+function elapsedText(p,st,i){
+  if(st.key==='kickoff') return p.start ? '起点' : '';
+  let prevDate;
+  if(st.key==='cmf'||st.key==='ui') prevDate=actOf(p,'final');
+  else if(st.key==='sample') prevDate=actConvergeDesign(p);
+  else prevDate=actOf(p,STAGES[i-1].key);
+  const curr=actOf(p,st.key);
+  if(curr && prevDate){const d=dayDiff(prevDate,curr);return d+'天';}
+  if(!curr && prevDate){const d=dayDiff(prevDate,todayStr);return '已'+d+'天';}
+  return '';
+}
+
+/* 数据迁移：旧 p.note → p.notes；旧 reviewCount/optimizeCount(数字) → 记录数组 */
+function migrateProject(p){
+  if(!p.notes || typeof p.notes!=='object') p.notes={};
+  if(!p.actuals || typeof p.actuals!=='object') p.actuals={};
+  // 次数 → 记录数组（每条含 日期 + 结果）
+  if(!Array.isArray(p.reviews)){
+    const n=(typeof p.reviewCount==='number')?p.reviewCount:0;
+    p.reviews=Array.from({length:n},()=>({date:'',result:''}));
+  }
+  if(!Array.isArray(p.optimizes)){
+    const n=(typeof p.optimizeCount==='number')?p.optimizeCount:0;
+    p.optimizes=Array.from({length:n},()=>({date:'',result:''}));
+  }
+  delete p.reviewCount; delete p.optimizeCount;
+  if(p.note && String(p.note).trim()){
+    const m=metrics(p);
+    let targetKey='stack';
+    if(m.bnLabel && m.bnLabel!=='—'){
+      const st=STAGES.find(s=>s.label===m.bnLabel);
+      if(st) targetKey=st.key;
+    }
+    if(!p.notes[targetKey]) p.notes[targetKey]=p.note;
+    else p.notes[targetKey]=p.note+'\n\n'+p.notes[targetKey];
+    delete p.note;
+  }
+}
+function migrateState(s){
+  if(!s || !Array.isArray(s.projects)) return;
+  s.projects.forEach(migrateProject);
+}
+
+// 关键路径上各阶段的累计延期与"增量贡献"（用于堆叠柱状图配色 & 卡点识别）
+function contributions(p){
+  function cumDelayAt(cp){
+    if(cp==='design'){
+      const cs=stdDate(p,'cmf'), us=stdDate(p,'ui'), ca=actOf(p,'cmf'), ua=actOf(p,'ui');
+      if(ca&&ua){const sConv=cs>us?cs:us, aConv=ca>ua?ca:ua;return dayDiff(sConv,aConv);}
+      if(ca&&cs) return dayDiff(cs,ca);
+      if(ua&&us) return dayDiff(us,ua);
+      return null;
+    }
+    const sd=stdDate(p,cp), ad=actOf(p,cp);
+    if(!sd||!ad) return null;
+    return dayDiff(sd,ad);
+  }
+  const out=[]; let prevCum=0;
+  PHASE_SEQ.forEach(cp=>{
+    const cd=cumDelayAt(cp);
+    if(cd===null) return;            // 该阶段还没到达
+    const inc=cd-prevCum; prevCum=cd;
+    out.push({key:cp,label:PHASE_LABELS[cp],color:PHASE_COLORS[cp],delay:inc});
+  });
+  return out;
+}
 
 function metrics(p){
-  let cum=0,bnLabel='—',maxInc=0,done=0,lastDone=-1,running=0;
-  STAGES.forEach((st,i)=>{
-    const act=actOf(p,i), std=stdDate(p,i);
-    if(act){done++;lastDone=i;}
-    if(act&&std){const dl=dayDiff(std,act);const inc=dl-running;
-      if(inc>maxInc){maxInc=inc;bnLabel=st.label;}running=dl;cum=dl;}
-  });
+  let done=0,lastDone=-1;
+  STAGES.forEach((st,i)=>{ if(actOf(p,st.key)){done++;lastDone=i;} });
+  // 累计延期 = 最新已完成里程碑相对其标准日的延期（标准日已累计前序滑移）
+  let cum=0;
+  if(lastDone>=0){
+    const st=STAGES[lastDone], sd=stdDate(p,st.key), ad=actOf(p,st.key);
+    if(sd&&ad) cum=dayDiff(sd,ad);
+  }
+  // 卡点 = 增量延期贡献最大的阶段
+  let bnLabel='—',maxC=0;
+  contributions(p).forEach(c=>{ if(c.delay>maxC){maxC=c.delay;bnLabel=c.label;} });
   return {cum,bnLabel,done,total:STAGES.length,lastDone};
 }
 function currentStageLabel(p){
   if(!p.start) return '未开始';
   for(let i=1;i<STAGES.length;i++){
-    const act=actOf(p,i);
-    if(!act) return STAGES[i].label;
+    if(!actOf(p,STAGES[i].key)) return STAGES[i].label;
   }
   return '已完成';
 }
@@ -278,7 +499,19 @@ function scheduleSave(){
   pendingTimer=setTimeout(()=>{pendingTimer=null;saveState().catch(e=>{console.warn('保存失败（已保留本机缓存）',e);setSaved();});},500);
 }
 
-function demoProject(){return {id:uid(),name:'示例项目 A',type:'a',start:'2026-01-05',note:'堆叠设计阶段供应商延迟交付样件，导致后续节点整体顺延。',actuals:{stack:'2026-01-12',id:'2026-02-03',review:'2026-02-04',optimize:'',final:'',sample:'',launch:''}};}
+function demoProject(){return {id:uid(),name:'示例项目 A',type:'a',start:'2026-01-05',
+  notes:{
+    stack:'供应商延迟交付样件，导致后续节点整体顺延。',
+    review:'评审意见反复修改，跨部门会议未达成一致。'
+  },
+  reviews:[
+    {date:'2026-02-04',result:'有条件通过：需修改散热结构'},
+    {date:'2026-02-12',result:'通过'}
+  ],
+  optimizes:[
+    {date:'2026-02-20',result:'按评审意见优化完成'}
+  ],
+  actuals:{stack:'2026-01-12',id:'2026-02-03',review:'2026-02-04',optimize:'',final:'',cmf:'',ui:'',sample:'',launch:''}};}
 
 function sameJson(a,b){
   try{return JSON.stringify(a)===JSON.stringify(b);}catch(e){return false;}
@@ -337,6 +570,7 @@ async function setupRealtime(){
         if(Date.now()-lastLocalPushAt < 1200) return;
         if(sameJson(incoming,state)) return;
         state = incoming;
+        migrateState(state);
         // 云端更新到来后，本地也缓存一份
         saveLocalState();
         render();
@@ -356,8 +590,13 @@ async function init(){
     state={config:{dur:JSON.parse(JSON.stringify(DEFAULT_DUR))},projects:[demoProject()]};
     saveLocalState();
   }
-
-  // 2) 再初始化登录/权限（决定是否可编辑）
+  migrateState(state);
+  // 补全新加阶段（cmf/ui 等）的默认工时，兼容旧的云端/本机数据
+  if(!state.config) state.config={dur:{}};
+  if(!state.config.dur) state.config.dur={};
+  Object.keys(DEFAULT_DUR).forEach(k=>{
+    if(!state.config.dur[k]) state.config.dur[k]=JSON.parse(JSON.stringify(DEFAULT_DUR[k]));
+  });
   await refreshAuth();
 
   // 3) 如果云端还没有数据且当前用户可编辑，则把当前 state “初始化/迁移”到云端
@@ -379,27 +618,41 @@ async function init(){
 /* ---------- 渲染 ---------- */
 function renderChart(){
   const el=document.getElementById('chart');
-  if(!state.projects.length){el.innerHTML='<div class="empty">还没有项目，点击「新建项目」开始。</div>';return;}
-  const data=state.projects.map(p=>({name:p.name||'未命名',cur:currentStageLabel(p),...metrics(p)}));
-  const maxCum=Math.max(10,...data.map(d=>Math.abs(d.cum)));
-  el.innerHTML=data.map(d=>{
-    const h=Math.max(4,Math.abs(d.cum)/maxCum*150);
-    const late=d.cum>0, ahead=d.cum<0;
-    const col=late?'var(--delay)':(ahead?'var(--ahead)':'var(--teal)');
-    const val=d.cum>0?('+'+d.cum):(''+d.cum);
-    const vcol=late?'var(--delay)':(ahead?'var(--ahead)':'var(--muted)');
+  if(!state.projects.length){el.innerHTML='<div class="empty">还没有项目，点击「新建项目」开始。</div>';
+    const lg=document.getElementById('chartLegend'); if(lg) lg.innerHTML=''; return;}
+  const per=state.projects.map(p=>{
+    const segs=contributions(p).filter(c=>c.delay>0);   // 只堆叠"造成延期"的阶段
+    const totalPos=segs.reduce((s,c)=>s+c.delay,0);
+    const m=metrics(p);
+    return {name:p.name||'未命名',segs,totalPos,net:m.cum,done:m.done,cur:currentStageLabel(p)};
+  });
+  const maxH=Math.max(10,...per.map(d=>d.totalPos));
+  el.innerHTML=per.map(d=>{
+    // 自底向上堆叠各阶段的延期贡献
+    const stack=d.segs.map(c=>{
+      const h=Math.max(3,c.delay/maxH*150);
+      return `<div class="seg" style="height:${h}px;background:${c.color}" title="${c.label}：+${c.delay}天"></div>`;
+    }).join('');
+    const netTxt=d.done?((d.net>0?'+'+d.net:''+d.net)+'天'):'—';
+    const netCol=d.net>0?'var(--delay)':(d.net<0?'var(--ahead)':'var(--muted)');
     return `<div class="cbar-col">
-      <div class="cbar-val" style="color:${vcol}">${d.done?val+'天':'—'}</div>
-      <div class="cbar-wrap"><div class="cbar" style="height:${h}px;background:${col}"></div></div>
-      <div class="cbar-name">${d.name}</div>
-      <div class="cbar-bn">目前节点：${d.cur}</div>
+      <div class="cbar-val" style="color:${netCol}">${netTxt}</div>
+      <div class="cbar-stack">${stack||'<div class="seg-base"></div>'}</div>
+      <div class="cbar-name">${escHtml(d.name)}</div>
+      <div class="cbar-bn">目前节点：${escHtml(d.cur)}</div>
     </div>`;
   }).join('');
+  // 图例：阶段 → 颜色
+  const lg=document.getElementById('chartLegend');
+  if(lg){
+    lg.innerHTML=PHASE_SEQ.map(k=>`<span><i style="background:${PHASE_COLORS[k]}"></i>${PHASE_LABELS[k]}</span>`).join('')
+      +`<span style="color:var(--muted)">（柱高=各阶段累加的延期天数；顶部数字=净累计延期）</span>`;
+  }
 }
 
 function renderTimeline(p){
   const nodes=STAGES.map((st,i)=>{
-    const act=actOf(p,i), std=stdDate(p,i);
+    const act=actOf(p,st.key), std=stdDate(p,st.key);
     let cls='',dtxt='·',dcol='var(--muted)';
     if(act&&std){const dl=dayDiff(std,act);
       if(dl>0){cls='late';dtxt='+'+dl;dcol='var(--delay)';}
@@ -409,11 +662,32 @@ function renderTimeline(p){
     else if(std&&dayDiff(std,todayStr)>0){cls='over';dtxt='超期';dcol='var(--amber)';}
     return {st,cls,dtxt,dcol,done:!!act};
   });
+  // 节点上方说明：ID评审/ID优化 显示记录次数；其它节点显示已用时间
+  function aboveHtml(p,i,n){
+    const key=n.st.key;
+    if(key==='review') return `<span class="ncount">评审 ${(p.reviews||[]).length}次</span>`;
+    if(key==='optimize') return `<span class="ncount">优化 ${(p.optimizes||[]).length}次</span>`;
+    const t=elapsedText(p,n.st,i);
+    if(!t) return '';
+    if(t==='起点') return `<span class="nelapsed-start">${t}</span>`;
+    if(t.startsWith('已')) return `<span class="nelapsed-ongoing">${t}</span>`;
+    return t;
+  }
   return `<div class="tlwrap"><div class="timeline">`+nodes.map((n,i)=>{
     let conn='';
-    if(i>0){const cc=n.done?(n.cls==='late'?'late':'done'):'';conn=`<div class="conn ${cc}"></div>`;}
-    return `<div class="node">${conn}<div class="dot ${n.cls}"></div>
-      <div class="nlabel">${n.st.label}</div>
+    if(i>0){
+      const prev=STAGES[i-1];
+      // CMF↔UI 为并行兄弟，连接线用虚线表示"同步进行"
+      const dashed=(prev.parallelGroup && n.st.parallelGroup && prev.parallelGroup===n.st.parallelGroup);
+      const cc=n.done?(n.cls==='late'?'late':'done'):'';
+      conn=`<div class="conn ${cc} ${dashed?'parallel':''}"></div>`;
+    }
+    const isSel=selectedNode && selectedNode.pid===p.id && selectedNode.stageKey===n.st.key;
+    const ptag=n.st.parallelGroup?`<span class="ptag">并行</span>`:'';
+    return `<div class="node ${isSel?'sel':''}" data-clicknode="1" data-pid="${p.id}" data-stage="${n.st.key}" title="点击查看/编辑该节点的备注">
+      <div class="nabove">${aboveHtml(p,i,n)}</div>
+      <div class="dotwrap">${conn}<div class="dot ${n.cls}"></div></div>
+      <div class="nlabel">${n.st.label}${ptag}</div>
       <div class="ndelay" style="color:${n.dcol}">${n.dtxt}</div></div>`;
   }).join('')+`</div></div>
   <div class="legend">
@@ -421,22 +695,66 @@ function renderTimeline(p){
     <span><i style="background:var(--delay)"></i>延期完成</span>
     <span><i style="background:#fff;border:2px solid var(--amber)"></i>超期未完成</span>
     <span><i style="background:#fff;border:2px solid var(--line)"></i>未开始</span>
+    <span>┄ 虚线 = CMF/UI 并行</span>
+    <span style="margin-left:auto;color:var(--teal)">💡 点击任意节点编辑该节点备注</span>
   </div>`;
 }
 
+function renderNotePanel(p){
+  if(!selectedNode || selectedNode.pid!==p.id) return '';
+  const stage=STAGES.find(s=>s.key===selectedNode.stageKey);
+  if(!stage) return '';
+  const note=(p.notes && p.notes[selectedNode.stageKey]) || '';
+  return `<div class="notepanel">
+    <div class="notepanel-head">
+      <span>📝 ${stage.label} · 节点备注</span>
+      <button class="notepanel-close" data-closenote="1" title="收起">×</button>
+    </div>
+    <textarea class="notepanel-input" ${canEdit?'':'disabled'}
+      data-pid="${p.id}" data-notekey="${selectedNode.stageKey}"
+      placeholder="记录该节点的卡点原因、关键决策、参与人员等…可回车换行">${escHtml(note)}</textarea>
+  </div>`;
+}
+
+function renderRecords(p,st){
+  const arr=p[st.records]||[];
+  const items=arr.map((r,idx)=>`<div class="recrow">
+    <span class="recidx">第${idx+1}次</span>
+    <input type="date" ${canEdit?'':'disabled'} value="${r.date||''}"
+      data-pid="${p.id}" data-recset="${st.records}" data-recidx="${idx}" data-recfield="date" title="${st.recordLabel}时间">
+    <input type="text" ${canEdit?'':'disabled'} value="${escHtml(r.result||'')}"
+      placeholder="${st.recordLabel}结果，如：通过 / 需修改 / 不通过"
+      data-pid="${p.id}" data-recset="${st.records}" data-recidx="${idx}" data-recfield="result">
+    <button class="recdel" ${canEdit?'':'disabled'} data-pid="${p.id}" data-recset="${st.records}" data-recdel="${idx}" title="删除该记录">×</button>
+  </div>`).join('');
+  return `<div class="recwrap">
+    <div class="rectitle">${st.recordLabel}记录（共 ${arr.length} 次）</div>
+    ${items||'<div class="recempty">暂无记录</div>'}
+    <button class="recadd" ${canEdit?'':'disabled'} data-pid="${p.id}" data-recadd="${st.records}">+ 添加${st.recordLabel}记录</button>
+  </div>`;
+}
 function renderDetail(p){
+  let rows='';
+  STAGES.forEach((st,i)=>{
+    const std=stdDate(p,st.key), act=actOf(p,st.key);
+    let dd='—',dc='var(--muted)';
+    if(act&&std){const dl=dayDiff(std,act);if(dl>0){dd='+'+dl;dc='var(--delay)';}else if(dl<0){dd=''+dl;dc='var(--ahead)';}else{dd='0';dc='var(--teal)';}}
+    const stdTxt=st.key==='kickoff'?(p.start||'—'):(std||'（先填起始日）');
+    const actInput=st.key==='kickoff'
+      ? `<span class="std">＝ 起始日</span>`
+      : `<input type="date" ${canEdit?'':'disabled'} value="${act}" data-pid="${p.id}" data-stage="${st.key}">`;
+    const ptag=st.parallelGroup?` <span class="ptag">并行</span>`:'';
+    rows+=`<div class="drow">
+      <div><div class="dlabel">${st.label}${ptag}</div>${st.desc?`<div class="ddesc">${escHtml(st.desc)}</div>`:''}</div>
+      <div class="std">${stdTxt}</div>
+      <div>${actInput}</div>
+      <div class="dd" style="color:${dc}">${dd}</div>
+    </div>`;
+    if(st.records) rows+=`<div class="drow recline"><div style="grid-column:1 / -1">${renderRecords(p,st)}</div></div>`;
+  });
   return `<div class="detail">
-    <div class="drow-head drow"><div>节点</div><div>标准完成日（自动）</div><div>实际完成日</div><div>延期</div></div>`+
-    STAGES.map((st,i)=>{
-      const std=stdDate(p,i), act=actOf(p,i);
-      let dd='—',dc='var(--muted)';
-      if(act&&std){const dl=dayDiff(std,act);if(dl>0){dd='+'+dl;dc='var(--delay)';}else if(dl<0){dd=''+dl;dc='var(--ahead)';}else{dd='0';dc='var(--teal)';}}
-      const stdTxt=i===0?(p.start||'—'):(std||'（先填起始日）');
-      const actInput=i===0
-        ? `<span class="std">＝ 起始日</span>`
-        : `<input type="date" ${canEdit?'':'disabled'} value="${act}" data-pid="${p.id}" data-stage="${st.key}">`;
-      return `<div class="drow"><div>${st.label}</div><div class="std">${stdTxt}</div><div>${actInput}</div><div class="dd" style="color:${dc}">${dd}</div></div>`;
-    }).join('')+`</div>`;
+    <div class="drow-head drow"><div>节点（含定义说明）</div><div>标准完成日（自动）</div><div>实际完成日</div><div>延期</div></div>
+    ${rows}</div>`;
 }
 
 function renderProjects(){
@@ -460,11 +778,8 @@ function renderProjects(){
         <div class="s">卡点阶段 <b style="font-size:14px">${m.cum>0?m.bnLabel:'无'}</b></div>
         <div class="s">进度 <b>${m.done}/${m.total}</b></div>
       </div>
-      <div class="noterow">
-        <span class="notelabel">📝 卡点备注</span>
-        <textarea class="noteinput" ${canEdit?'':'disabled'} data-pid="${p.id}" data-f="note" placeholder="可回车换行；每一行代表一个卡点备注（例如：供应商延迟交样 / 评审意见反复修改 / 资源未到位…）">${escHtml(p.note||'')}</textarea>
-      </div>
       ${renderTimeline(p)}
+      ${renderNotePanel(p)}
       <button class="link" data-toggle="${p.id}">${isOpen?'收起节点明细 ▲':'展开节点明细 ▼'}</button>
       ${isOpen?renderDetail(p):''}
     </div>`;
@@ -473,7 +788,9 @@ function renderProjects(){
 
 function renderConfig(){
   const rows=[['stack','预立项启动 → 堆叠设计'],['id','堆叠设计 → ID设计'],['review','ID设计 → ID评审'],
-    ['optimize','ID评审 → ID优化'],['final','ID优化 → ID定稿'],['sample','ID定稿 → 手板阶段'],['launch','手板阶段 → 项目立项']];
+    ['optimize','ID评审 → ID优化'],['final','ID优化 → ID定稿'],
+    ['cmf','ID定稿 → CMF设计（并行）'],['ui','ID定稿 → UI设计（并行）'],
+    ['sample','CMF/UI 完成 → 手板阶段'],['launch','手板阶段 → 项目立项']];
   document.getElementById('cfgTable').innerHTML=`<div class="cfgtable">
     <div class="cfg-row head"><div>阶段转换</div><div>一次性</div><div>二次性</div></div>`+
     rows.map(([k,lab])=>`<div class="cfg-row"><div>${lab}</div>
@@ -489,36 +806,84 @@ document.getElementById('addBtn').addEventListener('click',()=>{
     alert('当前为只读模式：请先点击右侧「登录」以获得编辑权限。');
     return;
   }
-  state.projects.push({id:uid(),name:'',type:'a',start:'',note:'',actuals:{}});
+  state.projects.push({id:uid(),name:'',type:'a',start:'',notes:{},reviews:[],optimizes:[],actuals:{}});
   render();scheduleSave();
   const els=document.querySelectorAll('.pname');if(els.length)els[els.length-1].focus();
 });
 
-// 文本类（项目名 / 备注）：input 实时更新，仅刷新图表避免失焦
+// 文本类（项目名 / 节点备注 / 记录结果）：input 实时更新，避免失焦
 document.getElementById('projects').addEventListener('input',e=>{
   if(!canEdit) return;
   const t=e.target;const p=state.projects.find(x=>x.id===t.dataset.pid);if(!p)return;
   if(t.dataset.f==='name'){p.name=t.value;renderChart();scheduleSave();}
-  else if(t.dataset.f==='note'){p.note=t.value;scheduleSave();}
+  else if(t.dataset.notekey){
+    if(!p.notes) p.notes={};
+    p.notes[t.dataset.notekey]=t.value;
+    scheduleSave();
+  }
+  else if(t.dataset.recfield==='result'){
+    const arr=p[t.dataset.recset]; const idx=+t.dataset.recidx;
+    if(arr&&arr[idx]){arr[idx].result=t.value;scheduleSave();}
+  }
 });
-// 日期类：change 后整张重算
+// 日期类 / 记录日期：change 后整张重算
 document.getElementById('projects').addEventListener('change',e=>{
   if(!canEdit) return;
   const t=e.target;const pid=t.dataset.pid;if(!pid)return;const p=state.projects.find(x=>x.id===pid);if(!p)return;
   if(t.dataset.f==='start'){p.start=t.value;}
   else if(t.dataset.stage){if(!p.actuals)p.actuals={};p.actuals[t.dataset.stage]=t.value;}
+  else if(t.dataset.recfield==='date'){
+    const arr=p[t.dataset.recset]; const idx=+t.dataset.recidx;
+    if(arr&&arr[idx]){arr[idx].date=t.value;}
+    else return;
+  }
   else return;
   render();scheduleSave();
 });
-// 类型切换 / 删除 / 展开
+// 类型切换 / 删除 / 展开 / 点击节点 / 关闭备注面板
 document.getElementById('projects').addEventListener('click',e=>{
   const t=e.target;
   if(t.dataset.toggle){
     const id=t.dataset.toggle;expanded.has(id)?expanded.delete(id):expanded.add(id);render();return;
   }
+  // 点击节点（圆点/标签/上方说明 都算）—— 任何身份都允许查看备注
+  const nodeEl=t.closest('[data-clicknode="1"]');
+  if(nodeEl){
+    const pid=nodeEl.dataset.pid, stageKey=nodeEl.dataset.stage;
+    if(selectedNode && selectedNode.pid===pid && selectedNode.stageKey===stageKey){
+      selectedNode=null;
+    } else {
+      selectedNode={pid,stageKey};
+    }
+    render();return;
+  }
+  // 关闭备注面板
+  if(t.dataset.closenote){selectedNode=null;render();return;}
   if(!canEdit) return;
+  // 添加评审/优化记录
+  if(t.dataset.recadd){
+    const p=state.projects.find(x=>x.id===t.dataset.pid);
+    if(p){if(!Array.isArray(p[t.dataset.recadd]))p[t.dataset.recadd]=[];
+      p[t.dataset.recadd].push({date:'',result:''});render();scheduleSave();}
+    return;
+  }
+  // 删除某条记录
+  if(t.dataset.recdel!==undefined && t.dataset.recset){
+    const p=state.projects.find(x=>x.id===t.dataset.pid);
+    const arr=p&&p[t.dataset.recset];
+    if(arr){arr.splice(+t.dataset.recdel,1);render();scheduleSave();}
+    return;
+  }
   if(t.dataset.type){const p=state.projects.find(x=>x.id===t.dataset.pid);if(p){p.type=t.dataset.type;render();scheduleSave();}}
-  else if(t.dataset.del){state.projects=state.projects.filter(x=>x.id!==t.dataset.del);expanded.delete(t.dataset.del);render();scheduleSave();}
+  else if(t.dataset.del){
+    // 删除前弹出确认模态框
+    pendingDelete=t.dataset.del;
+    const p=state.projects.find(x=>x.id===pendingDelete);
+    const name=(p&&p.name)?p.name:'未命名项目';
+    document.getElementById('delModalBody').innerHTML=
+      `即将删除项目 <b>"${escHtml(name)}"</b>。<br>删除后不可恢复，请确认。`;
+    document.getElementById('delModal').classList.add('show');
+  }
 });
 // 工时配置
 document.getElementById('cfgTable').addEventListener('change',e=>{
@@ -559,6 +924,28 @@ document.getElementById('authBtn').addEventListener('click', async ()=>{
 if(SUPA){
   SUPA.auth.onAuthStateChange(()=>{refreshAuth().catch(()=>{});});
 }
+
+// 删除确认模态框：取消 / 确认 / 背景点击 / ESC 键
+function closeDelModal(){pendingDelete=null;document.getElementById('delModal').classList.remove('show');}
+document.getElementById('delModalCancel').addEventListener('click',closeDelModal);
+document.getElementById('delModal').addEventListener('click',e=>{
+  if(e.target.id==='delModal') closeDelModal();
+});
+document.getElementById('delModalConfirm').addEventListener('click',()=>{
+  if(!pendingDelete||!canEdit){closeDelModal();return;}
+  const id=pendingDelete;
+  state.projects=state.projects.filter(x=>x.id!==id);
+  expanded.delete(id);
+  if(selectedNode && selectedNode.pid===id) selectedNode=null;
+  closeDelModal();
+  render();scheduleSave();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('delModal').classList.contains('show')) closeDelModal();
+    else if(selectedNode){selectedNode=null;render();}
+  }
+});
 
 init();
 </script>
